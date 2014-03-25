@@ -10,14 +10,14 @@ Termin oddania: 9 kwietnia 2014, godzina 19:00
                 (liczy się czas na serwerze SVN)
 
 1. Napisać programy klienta (mierniczyc) i serwera (mierniczys), które
-   działają w następujący sposób:
-   a) serwer pobiera z wiersza poleceń numer portu, a następnie
+   działają w następujący sposób:   
+   a) serwer pobiera z wiersza poleceń numer portu, a następnie   
    - nasłuchuje na gnieździe TCP na połączenia,
    - po odebraniu połączenia pobiera z niego numer portu UDP i dane,
      aż do zakończenia połaczenia przez klienta.
    - następnie przesyła z powrotem do klienta po UDP liczbę otrzymanych 
-     oktetów danych (nie licząc numeru portu).
-   b) klient pobiera z wiersza poleceń numer portu UDP, numer portu TCP, 
+     oktetów danych (nie licząc numeru portu).   
+   b) klient pobiera z wiersza poleceń numer portu UDP, numer portu TCP,    
      oraz adres serwera (w takiej dokładnie kolejności), a następnie
    - otwiera port UDP o numerze podanym w wierszu poleceń,
    - łączy się z serwerem za pomocą TCP na podany w wierszu poleceń numer
