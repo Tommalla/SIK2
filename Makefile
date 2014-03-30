@@ -1,14 +1,17 @@
 .PHONY: all clean
 
-CXXFLAGS=-Wall -g
+CFLAGS+=-Wall -g
 
 all: mierniczyc mierniczys
 
-mierniczyc: mierniczyc.c
-	gcc $(CXXFLAGS) mierniczyc.c -o mierniczyc
+mierniczyc: err.o mierniczyc.c
+	gcc $(CFLAGS) mierniczyc.c err.o -o mierniczyc
 
-mierniczys: mierniczys.c
-	gcc $(CXXFLAGS) mierniczys.c -o mierniczys
+mierniczys: err.o mierniczys.c
+	gcc $(CFLAGS) mierniczys.c err.o -o mierniczys
+
+err.o: err.h err.c
+	gcc $(CFLAGS) err.c -c -o err.o
 
 clean:
-	rm -rf mierniczyc mierniczys
+	rm -rf mierniczyc mierniczys *.o
