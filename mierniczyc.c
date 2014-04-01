@@ -49,7 +49,7 @@ int main(const int argc, char** argv) {
 	int err;
 
 	if (argc != 4)
-		syserr(usage_error);
+		fatal(usage_error);
 
 	//converting input
 	udp_port = str_to_short(argv[1]);

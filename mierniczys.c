@@ -13,9 +13,14 @@
 
 #define BUFFER_SIZE   1000
 #define QUEUE_LENGTH     5
-#define PORT_NUM     1625
 
-int main() {
+const char* usage_msg = "Wrong arguments! Correct usage is: mierniczys <port>";
+
+int main(int argc, char** argv) {
+	if (argc != 2)
+		fatal(usage_msg);
+
+	short int tcp_port;
 	int tcp_sock, msg_sock;
 	struct sockaddr_in server_address;
 	struct sockaddr_in client_address;
@@ -30,7 +35,7 @@ int main() {
 
 	server_address.sin_family = AF_INET; // IPv4
 	server_address.sin_addr.s_addr = htonl(INADDR_ANY); // listening on all interfaces
-	server_address.sin_port = htons(PORT_NUM); // listening on port PORT_NUM
+	server_address.sin_port = htons(atoi(argv[1])); // listening on port from args
 
 	// bind the socket to a concrete address
 	if (bind(tcp_sock, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
@@ -54,36 +59,18 @@ int main() {
 				syserr("reading from client socket");
 			else if (tcp_rcv_len > 0) {
 				printf("read from socket: %zd bytes: %.*s\n", tcp_rcv_len, (int) tcp_rcv_len, buffer);
-				int sock;
-				struct addrinfo addr_hints;
-				struct addrinfo *addr_result;
 
-				int i, flags, sflags;
+				int sock;
+				int sflags;
+
 				size_t len;
 				ssize_t snd_len, rcva_len;
 				struct sockaddr_in my_address;
-				struct sockaddr_in srvr_address;
-
-				// 'converting' host/port in string to struct addrinfo
-				(void) memset(&addr_hints, 0, sizeof(struct addrinfo));
-				addr_hints.ai_family = AF_INET; // IPv4
-				addr_hints.ai_socktype = SOCK_DGRAM;
-				addr_hints.ai_protocol = IPPROTO_UDP;
-				addr_hints.ai_flags = 0;
-				addr_hints.ai_addrlen = 0;
-				addr_hints.ai_addr = NULL;
-				addr_hints.ai_canonname = NULL;
-				addr_hints.ai_next = NULL;
-				if (getaddrinfo("localhost", NULL, &addr_hints, &addr_result) != 0) {
-					syserr("getaddrinfo");
-				}
 
 				my_address.sin_family = AF_INET; // IPv4
 				my_address.sin_addr.s_addr =
-				((struct sockaddr_in*) (addr_result->ai_addr))->sin_addr.s_addr; // address IP
+				client_address.sin_addr.s_addr; // address IP
 				my_address.sin_port = htons((uint16_t) atoi(buffer));
-
-				freeaddrinfo(addr_result);
 
 				sock = socket(PF_INET, SOCK_DGRAM, 0);
 				if (sock < 0)
