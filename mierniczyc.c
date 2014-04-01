@@ -107,7 +107,8 @@ int main(const int argc, char** argv) {
 	if (len < 0)
 		syserr("error on datagram from client socket");
 	// 		} while (len > 0);
-	(void) printf("%s", buffer);
+	buffer[len] = '\0';
+	(void) printf("%s\n", buffer);
 	close(udp_sock);
 
 	return 0;

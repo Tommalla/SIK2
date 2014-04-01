@@ -23,6 +23,7 @@ int str_to_short(char* str, const char* error) {
 
 void tcp_write(int sock, char* msg) {
 	ssize_t len = strlen(msg);
+	printf("TCP: writing %s\n", msg);
 	if (write(sock, msg, len) != len)
 		syserr("partial / failed TCP write");
 }
