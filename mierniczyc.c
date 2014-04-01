@@ -100,13 +100,13 @@ int main(const int argc, char** argv) {
 
 	//get UDP data
 	rcva_len = (ssize_t) sizeof(server_address);
-	// 		do {
-	flags = 0; // we do not request anything special
-	len = recvfrom(udp_sock, buffer, sizeof(buffer), flags,
+	do {
+		flags = 0; // we do not request anything special
+		len = recvfrom(udp_sock, buffer, sizeof(buffer), flags,
 		       (struct sockaddr *) &client_address, &rcva_len);
-	if (len < 0)
-		syserr("error on datagram from client socket");
-	// 		} while (len > 0);
+		if (len < 0)
+			syserr("error on datagram from client socket");
+	} while (client_address.sin_addr.s_addr != ((struct sockaddr_in*)addr_result->ai_addr)->sin_addr.s_addr);
 	buffer[len] = '\0';
 	(void) printf("%s\n", buffer);
 	close(udp_sock);
