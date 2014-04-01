@@ -16,7 +16,8 @@ Termin oddania: 9 kwietnia 2014, godzina 19:00
    - po odebraniu połączenia pobiera z niego numer portu UDP i dane,
      aż do zakończenia połaczenia przez klienta.
    - następnie przesyła z powrotem do klienta po UDP liczbę otrzymanych 
-     oktetów danych (nie licząc numeru portu).   
+     oktetów danych (nie licząc numeru portu).
+     
    b) klient pobiera z wiersza poleceń numer portu UDP, numer portu TCP,    
      oraz adres serwera (w takiej dokładnie kolejności), a następnie
    - otwiera port UDP o numerze podanym w wierszu poleceń,
