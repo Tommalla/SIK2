@@ -11,27 +11,13 @@
 #include <stdlib.h>
 
 #include "err.h"
+#include "utils.h"
 
 #define BUFFER_SIZE   1000
 #define QUEUE_LENGTH     5
 
 char buffer[BUFFER_SIZE];
 const char* usage_error = "Wrong arguments! Correct usage is: mierniczyc <UDP port> <TCP port> <server address>";
-
-/**
- * @brief Returns the decimal value of a string or stops the program if the conversion failed.
- */
-int str_to_short(char* str) {
-	char * endptr;
-	short int res;
-
-	endptr = str + strlen(str);
-	res = (short int)strtol(str, &endptr, 10);
-
-	if (endptr != str + strlen(str))
-		syserr(usage_error);
-	return res;
-}
 
 int main(const int argc, char** argv) {
 	int udp_sock, tcp_sock;
@@ -52,8 +38,8 @@ int main(const int argc, char** argv) {
 		fatal(usage_error);
 
 	//converting input
-	udp_port = str_to_short(argv[1]);
-	tcp_port = str_to_short(argv[2]);
+	udp_port = str_to_short(argv[1], usage_error);
+	tcp_port = str_to_short(argv[2], usage_error);
 
 	printf("udp: %d, tcp: %d\n", udp_port, tcp_port);
 

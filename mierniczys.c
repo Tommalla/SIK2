@@ -10,11 +10,13 @@
 #include <unistd.h>
 
 #include "err.h"
+#include "utils.h"
 
 #define BUFFER_SIZE   1000
 #define QUEUE_LENGTH     5
 
 const char* usage_msg = "Wrong arguments! Correct usage is: mierniczys <port>";
+char buffer[BUFFER_SIZE];
 
 int main(int argc, char** argv) {
 	if (argc != 2)
@@ -26,8 +28,9 @@ int main(int argc, char** argv) {
 	struct sockaddr_in client_address;
 	socklen_t client_address_len;
 
-	char buffer[BUFFER_SIZE];
 	ssize_t tcp_rcv_len;
+
+	tcp_port = str_to_short(argv[1], usage_msg);
 
 	tcp_sock = socket(PF_INET, SOCK_STREAM, 0); // creating IPv4 TCP socket
 	if (tcp_sock <0)
@@ -35,7 +38,7 @@ int main(int argc, char** argv) {
 
 	server_address.sin_family = AF_INET; // IPv4
 	server_address.sin_addr.s_addr = htonl(INADDR_ANY); // listening on all interfaces
-	server_address.sin_port = htons(atoi(argv[1])); // listening on port from args
+	server_address.sin_port = htons(tcp_port); // listening on port from args
 
 	// bind the socket to a concrete address
 	if (bind(tcp_sock, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
@@ -45,7 +48,7 @@ int main(int argc, char** argv) {
 	if (listen(tcp_sock, QUEUE_LENGTH) < 0)
 		syserr("listen");
 
-	printf("accepting client connections on port %hu\n", ntohs(server_address.sin_port));
+	printf("Accepting client connections on port %hu\n", ntohs(server_address.sin_port));
 
 	for (;;) {
 		client_address_len = sizeof(client_address);
@@ -70,7 +73,7 @@ int main(int argc, char** argv) {
 				my_address.sin_family = AF_INET; // IPv4
 				my_address.sin_addr.s_addr =
 				client_address.sin_addr.s_addr; // address IP
-				my_address.sin_port = htons((uint16_t) atoi(buffer));
+				my_address.sin_port = htons((uint16_t) str_to_short(buffer, "Received port number is invalid"));
 
 				sock = socket(PF_INET, SOCK_DGRAM, 0);
 				if (sock < 0)
