@@ -22,7 +22,7 @@ const char* usage_error = "Wrong arguments! Correct usage is: mierniczyc <UDP po
 int main(const int argc, char** argv) {
 	int udp_sock, tcp_sock;
 	short int udp_port, tcp_port;
-	int flags;
+	int i, flags;
 	struct sockaddr_in server_address;
 	struct sockaddr_in client_address;
 
@@ -78,16 +78,27 @@ int main(const int argc, char** argv) {
 	freeaddrinfo(addr_result);
 
 	//send data to server
-	len = strlen(argv[1]);
-	if (write(tcp_sock, argv[1], len) != len) {
-		syserr("partial / failed TCP write");
+	tcp_write(tcp_sock, argv[1]);
+
+	// read answer
+	len = strlen(CORRECT_ANSWER);
+	if (read(tcp_sock, buffer, len) != len) {
+		syserr("partial / failed TCP read or read wrong message");
+	}
+
+	for (i = 0; i < len; ++i)
+		if (buffer[i] != CORRECT_ANSWER[i])
+			fatal("Wrong server answer: %s", buffer);
+
+	//if OK, read from stdin and write to TCP
+	while (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+		tcp_write(tcp_sock, buffer);
 	}
 
 	//close TCP connection
 	close(tcp_sock);
 
 	//get UDP data
-
 	rcva_len = (ssize_t) sizeof(server_address);
 	// 		do {
 	flags = 0; // we do not request anything special
