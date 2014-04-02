@@ -22,17 +22,15 @@ const char* usage_error = "Wrong arguments! Correct usage is: mierniczyc <UDP po
 int main(const int argc, char** argv) {
 	int udp_sock, tcp_sock;
 	short int udp_port, tcp_port;
-	int i, flags;
+	int i, flags, err;
 	struct sockaddr_in server_address;
 	struct sockaddr_in client_address;
 
-	socklen_t rcva_len;
+	socklen_t rcv_len;
 	ssize_t len;
 
 	struct addrinfo addr_hints;
 	struct addrinfo *addr_result;
-
-	int err;
 
 	if (argc != 4)
 		fatal(usage_error);
@@ -56,7 +54,7 @@ int main(const int argc, char** argv) {
 	if (bind(udp_sock, (struct sockaddr *) &server_address, (socklen_t) sizeof(server_address)) < 0)
 		syserr("UDP bind");
 
-	//connecting to TCP server
+	// connecting to TCP server
 	// 'converting' host/port in string to struct addrinfo
 	memset(&addr_hints, 0, sizeof(struct addrinfo));
 	addr_hints.ai_family = AF_INET; // IPv4
@@ -99,11 +97,11 @@ int main(const int argc, char** argv) {
 	close(tcp_sock);
 
 	//get UDP data
-	rcva_len = (ssize_t) sizeof(server_address);
+	rcv_len = (ssize_t) sizeof(server_address);
 	do {
 		flags = 0; // we do not request anything special
 		len = recvfrom(udp_sock, buffer, sizeof(buffer), flags,
-		       (struct sockaddr *) &client_address, &rcva_len);
+		       (struct sockaddr *) &client_address, &rcv_len);
 		if (len < 0)
 			syserr("error on datagram from client socket");
 	} while (client_address.sin_addr.s_addr != ((struct sockaddr_in*)addr_result->ai_addr)->sin_addr.s_addr);

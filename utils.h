@@ -11,6 +11,11 @@
  */
 int str_to_short(char* str, const char* error);
 
+/**
+ * @brief Returns a non-negative decimal value of a string or -1 if the conversion failed.
+ */
+int safe_str_to_short(char* str);
+
 void tcp_write(int sock, char* msg);
 
 #endif // UTILS_H
