@@ -73,8 +73,6 @@ int main(const int argc, char** argv) {
 	if (connect(tcp_sock, addr_result->ai_addr, addr_result->ai_addrlen) < 0)
 		syserr("TCP connect");
 
-	freeaddrinfo(addr_result);
-
 	//send data to server
 	tcp_write(tcp_sock, argv[1]);
 
@@ -105,8 +103,11 @@ int main(const int argc, char** argv) {
 		if (len < 0)
 			syserr("error on datagram from client socket");
 	} while (client_address.sin_addr.s_addr != ((struct sockaddr_in*)addr_result->ai_addr)->sin_addr.s_addr);
+
 	buffer[len] = '\0';
 	(void) printf("%s\n", buffer);
+
+	freeaddrinfo(addr_result);
 	close(udp_sock);
 
 	return 0;
