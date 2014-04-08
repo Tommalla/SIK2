@@ -39,7 +39,7 @@ int main(const int argc, char** argv) {
 	udp_port = str_to_short(argv[1], usage_error);
 	tcp_port = str_to_short(argv[2], usage_error);
 
-	printf("Server started with port numbers: udp: %d, tcp: %d\n", udp_port, tcp_port);
+	printf("Client started with port numbers: udp: %d, tcp: %d\n", udp_port, tcp_port);
 
 	//opening udp port
 	udp_sock = socket(AF_INET, SOCK_DGRAM, 0); // creating IPv4 UDP socket
@@ -101,7 +101,7 @@ int main(const int argc, char** argv) {
 		       (struct sockaddr *) &client_address, &rcv_len);
 		if (len < 0)
 			syserr("error on datagram from client socket");
-	} while (client_address.sin_addr.s_addr != ((struct sockaddr_in*)addr_result->ai_addr)->sin_addr.s_addr);
+	} while (ntohs(client_address.sin_addr.s_addr) != ntohs(((struct sockaddr_in*)addr_result->ai_addr)->sin_addr.s_addr));
 
 	buffer[len] = '\0';
 	printf("%s\n", buffer);
