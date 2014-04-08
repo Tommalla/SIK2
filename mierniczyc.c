@@ -22,7 +22,7 @@ const char* usage_error = "Wrong arguments! Correct usage is: mierniczyc <UDP po
 int main(const int argc, char** argv) {
 	int udp_sock, tcp_sock;
 	short int udp_port, tcp_port;
-	int i, flags, err;
+	int i, err;
 	struct sockaddr_in server_address;
 	struct sockaddr_in client_address;
 
@@ -39,7 +39,7 @@ int main(const int argc, char** argv) {
 	udp_port = str_to_short(argv[1], usage_error);
 	tcp_port = str_to_short(argv[2], usage_error);
 
-	printf("udp: %d, tcp: %d\n", udp_port, tcp_port);
+	printf("Server started with port numbers: udp: %d, tcp: %d\n", udp_port, tcp_port);
 
 	//opening udp port
 	udp_sock = socket(AF_INET, SOCK_DGRAM, 0); // creating IPv4 UDP socket
@@ -95,17 +95,16 @@ int main(const int argc, char** argv) {
 	close(tcp_sock);
 
 	//get UDP data
-	rcv_len = (ssize_t) sizeof(server_address);
+	rcv_len = (ssize_t) sizeof(client_address);
 	do {
-		flags = 0; // we do not request anything special
-		len = recvfrom(udp_sock, buffer, sizeof(buffer), flags,
+		len = recvfrom(udp_sock, buffer, sizeof(buffer), 0,
 		       (struct sockaddr *) &client_address, &rcv_len);
 		if (len < 0)
 			syserr("error on datagram from client socket");
 	} while (client_address.sin_addr.s_addr != ((struct sockaddr_in*)addr_result->ai_addr)->sin_addr.s_addr);
 
 	buffer[len] = '\0';
-	(void) printf("%s\n", buffer);
+	printf("%s\n", buffer);
 
 	freeaddrinfo(addr_result);
 	close(udp_sock);

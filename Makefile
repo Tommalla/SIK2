@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-CFLAGS+=-Wall -g
+CFLAGS+=-Wall -g -std=gnu11 -pedantic
 
 all: mierniczyc mierniczys
 

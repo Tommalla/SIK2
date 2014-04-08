@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
 		if (tcp_rcv_len < 0)
 			syserr("reading from client socket");
 		else if (tcp_rcv_len > 0) {
-			printf("read from socket: %zd bytes: \"%s\"\n", tcp_rcv_len, buffer);
+			printf("Read from socket: %zd bytes: \"%s\"\n", tcp_rcv_len, buffer);
 			//convert to port and respond
 			udp_port = safe_str_to_short(buffer);
 			if (udp_port < 0) {
@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
 
 			sprintf(buffer, "%u", data_len);
 			len = strlen(buffer);
-			(void) printf("sending to socket: %s\n", buffer);
+			printf("Sending to UDP socket: %s\n", buffer);
 			sflags = 0;
 			rcva_len = (socklen_t) sizeof(my_address);
 			snd_len = sendto(sock, buffer, len, sflags,
