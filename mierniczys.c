@@ -65,15 +65,13 @@ int main(int argc, char** argv) {
 			syserr("reading from client socket");
 		else if (tcp_rcv_len > 0) {
 			printf("Read from socket: %zd bytes: \"%s\"\n", tcp_rcv_len, buffer);
-			//convert to port and respond
+			//convert to port
 			udp_port = safe_str_to_short(buffer);
 			if (udp_port < 0) {
 				printf("ERROR: Wrong/corrupted UDP port number: \"%s\" [%d]. Closing connection.\n", buffer, udp_port);
-				tcp_write(msg_sock, "NOPE.");
 				close(msg_sock);
 				continue;
 			}
-			tcp_write(msg_sock, CORRECT_ANSWER);
 			data_len = 0;
 
 			while (tcp_rcv_len > 0) {
