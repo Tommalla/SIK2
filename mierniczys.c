@@ -62,9 +62,9 @@ int main(int argc, char** argv) {
 		tcp_rcv_len = read(msg_sock, buffer, sizeof(buffer));
 		buffer[tcp_rcv_len] = '\0';
 		if (tcp_rcv_len < 0)
-			syserr("reading from client socket");
+			syserr("Reading from client socket");
 		else if (tcp_rcv_len > 0) {
-			printf("Read from socket: %zd bytes: \"%s\"\n", tcp_rcv_len, buffer);
+			printf("Read port number from socket: \"%s\"\n", buffer);
 			//convert to port
 			udp_port = safe_str_to_short(buffer);
 			if (udp_port < 0) {
