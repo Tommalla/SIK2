@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
 	if (argc != 2)
 		fatal(usage_msg);
 
-	short int tcp_port, udp_port;
+	unsigned short int tcp_port, udp_port;
 	unsigned int data_len;
 	int tcp_sock, msg_sock;
 	struct sockaddr_in server_address;
@@ -59,19 +59,12 @@ int main(int argc, char** argv) {
 			syserr("accept");
 
 		//read port number
-		tcp_rcv_len = read(msg_sock, buffer, sizeof(buffer));
-		buffer[tcp_rcv_len] = '\0';
+		tcp_rcv_len = read(msg_sock, &udp_port, sizeof(udp_port));
+		udp_port = ntohs(udp_port);
 		if (tcp_rcv_len < 0)
 			syserr("Reading from client socket");
 		else if (tcp_rcv_len > 0) {
-			printf("Read port number from socket: \"%s\"\n", buffer);
-			//convert to port
-			udp_port = safe_str_to_short(buffer);
-			if (udp_port < 0) {
-				printf("ERROR: Wrong/corrupted UDP port number: \"%s\" [%d]. Closing connection.\n", buffer, udp_port);
-				close(msg_sock);
-				continue;
-			}
+			printf("Read port number from socket: %d\n", udp_port);
 			data_len = 0;
 
 			while (tcp_rcv_len > 0) {
@@ -79,14 +72,11 @@ int main(int argc, char** argv) {
 				data_len += tcp_rcv_len;
 			}
 
-			printf("ending TCP connection\n");
 			if (close(msg_sock) < 0)
 				syserr("close");
 
 			int sock;
-			int sflags;
 
-			size_t len;
 			ssize_t snd_len, rcva_len;
 			struct sockaddr_in my_address;
 
@@ -99,21 +89,18 @@ int main(int argc, char** argv) {
 			if (sock < 0)
 				syserr("socket");
 
-			sprintf(buffer, "%u", data_len);
-			len = strlen(buffer);
-			printf("Sending to UDP socket: %s\n", buffer);
-			sflags = 0;
+			printf("Sending to UDP socket: %u\n\n", data_len);
+			data_len = htonl(data_len);
 			rcva_len = (socklen_t) sizeof(my_address);
-			snd_len = sendto(sock, buffer, len, sflags,
+			snd_len = sendto(sock, &data_len, sizeof(data_len), 0,
 					 (struct sockaddr *) &my_address, rcva_len);
-			if (snd_len != (ssize_t) len) {
+			if (snd_len != sizeof(data_len)) {
 				syserr("partial / failed UDP write");
 			}
 
 			if (close(sock) == -1) { //very rare errors can occur here, but then
 				syserr("close"); //it's healthy to do the check
 			}
-
 		}
 	}
 	close(tcp_sock);

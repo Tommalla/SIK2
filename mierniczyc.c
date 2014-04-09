@@ -21,7 +21,8 @@ const char* usage_error = "Wrong arguments! Correct usage is: mierniczyc <UDP po
 
 int main(const int argc, char** argv) {
 	int udp_sock, tcp_sock;
-	short int udp_port, tcp_port;
+	unsigned short int udp_port, tcp_port;
+	unsigned int res;
 	int err;
 	struct sockaddr_in server_address;
 	struct sockaddr_in client_address;
@@ -74,11 +75,15 @@ int main(const int argc, char** argv) {
 		syserr("TCP connect");
 
 	//send port number to server
-	tcp_write(tcp_sock, argv[1]);
+	udp_port = htons(udp_port);
+	if (write(tcp_sock, &udp_port, sizeof(udp_port)) != sizeof(udp_port))
+		syserr("partial / failed TCP write");
 
 	// read from stdin and write to TCP
 	while (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-		tcp_write(tcp_sock, buffer);
+		ssize_t len = strlen(buffer);
+		if (write(tcp_sock, buffer, len) != len)
+			syserr("partial / failed TCP write");
 	}
 
 	//close TCP connection
@@ -87,14 +92,14 @@ int main(const int argc, char** argv) {
 	//get UDP data
 	rcv_len = (ssize_t) sizeof(client_address);
 	do {
-		len = recvfrom(udp_sock, buffer, sizeof(buffer), 0,
+		len = recvfrom(udp_sock, &res, sizeof(res), 0,
 		       (struct sockaddr *) &client_address, &rcv_len);
 		if (len < 0)
-			syserr("error on datagram from client socket");
+			syserr("error on datagram from server");
+		res = ntohl(res);
 	} while (ntohs(client_address.sin_addr.s_addr) != ntohs(((struct sockaddr_in*)addr_result->ai_addr)->sin_addr.s_addr));
 
-	buffer[len] = '\0';
-	printf("%s\n", buffer);
+	printf("%u\n", res);
 
 	freeaddrinfo(addr_result);
 	close(udp_sock);
